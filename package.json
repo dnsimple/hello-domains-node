@@ -25,9 +25,8 @@
   "dependencies": {
     "connect": "~3.4.1",
     "client-sessions": "~0.7.0",
-    "randomstring": "~1.1.5"
+    "randomstring": "~1.1.5",
+    "dnsimple": "git+https://github.com/dnsimple/dnsimple-node.git"
   },
   "license": "MIT" 
 }
-
-

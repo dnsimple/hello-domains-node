@@ -24,12 +24,8 @@ module.exports = config;
 
 ## Start the Hello Domains app
 
-* Install dependencies:
-  - `npm install connect`
-  - `npm install client-sessions`
-  - `npm install randomstring`
-* Create and migrate your database with `createdb hello_domains_dev && psql hello_domains_dev < schema.sql`
+First, install dependencies: `npm install`
 
-Noe that the application is configured, start it with `node server.js`
+Start the server with `npm start` or `node server.js`
 
-Now you can visit [`http://localhost:4000`](http://localhost:3000) from your browser.
+Now you can visit [`http://localhost:3000`](http://localhost:3000) from your browser.
