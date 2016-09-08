@@ -1,0 +1,32 @@
+{
+  "name": "hello-domains",
+  "version": "0.0.1",
+  "description": "Hello Domains (for Node.js)",
+  "keywords": [
+    "dnsimple",
+    "domains",
+    "dns",
+    "domain management"
+  ],
+  "homepage": "https://github.com/dnsimple/hello-domains-node",
+  "author": "DNSimple <support@dnsimple.com> (https://dnsimple.com/)",
+  "contributors": [
+    "Anthony Eden <anthony.eden@dnsimple.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dnsimple/hello-domains-node.git"
+  },
+  "bugs:": "https://github.com/dnsimple/hello-domains-node/issues",
+  "engines": {
+    "node": ">= v6.0.0"
+  },
+  "main": "server.js",
+  "dependencies": {
+    "connect": "~3.4.1",
+    "client-sessions": "~ 0.7.0"
+  },
+  "license": "MIT" 
+}
+
+
