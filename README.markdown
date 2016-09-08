@@ -27,6 +27,7 @@ module.exports = config;
 * Install dependencies:
   - `npm install connect`
   - `npm install client-sessions`
+  - `npm install randomstring`
 * Create and migrate your database with `createdb hello_domains_dev && psql hello_domains_dev < schema.sql`
 
 Noe that the application is configured, start it with `node server.js`
