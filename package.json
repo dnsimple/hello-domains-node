@@ -24,7 +24,8 @@
   "main": "server.js",
   "dependencies": {
     "connect": "~3.4.1",
-    "client-sessions": "~ 0.7.0"
+    "client-sessions": "~0.7.0",
+    "randomstring": "~1.1.5"
   },
   "license": "MIT" 
 }

@@ -4,10 +4,10 @@ const config = require('./config');
 
 const http = require('http');
 const url = require('url');
+const sessions = require('client-sessions');
+const randomstring = require('randomstring');
 
 const Dnsimple = require('dnsimple');
-
-const sessions = require('client-sessions');
 
 const app = require('connect')();
 app.use(sessions({
@@ -17,7 +17,8 @@ app.use(sessions({
 
 // Handlers
 
-const errorHandler = function(error) {
+const errorHandler = function(req, res, error) {
+  console.log(error);
   res.statusCode = 400;
   res.setHeader('Content-type', 'text/plain');
   res.end(`error: ${error}`);
@@ -30,7 +31,8 @@ const notFoundHandler = function(req, res) {
 }
 
 const rootHandler = function(req, res) {
-  let state = '123456780';
+  let state = randomstring.generate(12);
+  req.session.state = state;
   let client = Dnsimple({});
 
   res.statusCode = 200;
@@ -39,35 +41,46 @@ const rootHandler = function(req, res) {
 }
 
 const authorizedHandler = function(req, res) {
-  let state = '123456780';
   let requestUrl = url.parse(req.url, true);
 
   if (requestUrl.query.error != null) {
-    errorHandler(requestUrl.query.error_description);
+    errorHandler(req, res, requestUrl.query.error_description);
     return
   }
 
+  let state = req.session.state;
   let client = Dnsimple({});
-  client.oauth.exchangeAuthorizationForToken(requestUrl.query.code, config.clientId, config.clientSecret, {state: state}).then(function(response) {
+  let code = requestUrl.query.code;
+
+  client.oauth.exchangeAuthorizationForToken(code, config.clientId, config.clientSecret, {state: state}).then(function(response) {
     let accessToken = response.access_token;
     req.session.accessToken = accessToken;
     client = Dnsimple({accessToken: accessToken});
     return client.identity.whoami();
-  }, errorHandler).then(function(response) {
+  }, function(error) {
+    errorHandler(req, res, error);
+  }).then(function(response) {
+    let email = response.data.account.email;
+    req.session.accountId = response.data.account.id;
+
     res.statusCode = 200;
-    res.setHeader('Content-type', 'text/plain');
-    res.end(`Response:\n\n${JSON.stringify(response, null, '  ')}`);
-  }, errorHandler);
+    res.setHeader('Content-type', 'text/html');
+    res.end(`<!DOCTYPE html><html><p>authorized as ${email}<p><a href="/domains">list domains</a></p></html>`);
+  }, function(error) {
+    errorHandler(req, res, error);
+  });
 }
 
 const domainsHandler = function(req, res) {
   if (req.session && req.session.accessToken) {
     let client = Dnsimple({accessToken: req.session.accessToken});
-    client.domains.allDomains(1).then((response) => {
+    client.domains.allDomains(req.session.accountId).then((response) => {
       res.statusCode = 200;
       res.setHeader('Content-type', 'text/plain');
       res.end(`Response:\n\n${JSON.stringify(response, null, '  ')}`);
-    }, errorHandler);
+    }, function(error) {
+      errorHandler(req, res, error);
+    });
   } else {
     res.writeHead(302, {
       'Location': '/'
