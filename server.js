@@ -6,6 +6,7 @@ const http = require('http');
 const url = require('url');
 const sessions = require('client-sessions');
 const randomstring = require('randomstring');
+const util = require('util');
 
 const Dnsimple = require('dnsimple');
 
@@ -18,10 +19,10 @@ app.use(sessions({
 // Handlers
 
 const errorHandler = function(req, res, error) {
-  console.log(error);
-  res.statusCode = 400;
+  console.error(error);
+  res.statusCode = 500;
   res.setHeader('Content-type', 'text/plain');
-  res.end(`error: ${error}`);
+  res.end(util.inspect(error));
 }
 
 const notFoundHandler = function(req, res) {
