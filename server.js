@@ -16,6 +16,8 @@ app.use(sessions({
   secret: config.session.secret,
 }));
 
+const redirect_uri = `http://${config.hostname}:${config.port}/authorized`
+
 // Handlers
 
 const errorHandler = function(req, res, error) {
@@ -38,7 +40,7 @@ const rootHandler = function(req, res) {
 
   res.statusCode = 200;
   res.setHeader('Content-type', 'text/html');
-  res.end(`<a href="${client.oauth.authorizeUrl(config.clientId, {state: state})}">authorize</a>`);
+  res.end(`<a href="${client.oauth.authorizeUrl(config.clientId, {state: state, redirect_uri: redirect_uri})}">authorize</a>`);
 }
 
 const authorizedHandler = function(req, res) {
@@ -53,7 +55,7 @@ const authorizedHandler = function(req, res) {
   let client = Dnsimple({});
   let code = requestUrl.query.code;
 
-  client.oauth.exchangeAuthorizationForToken(code, config.clientId, config.clientSecret, {state: state}).then(function(response) {
+  client.oauth.exchangeAuthorizationForToken(code, config.clientId, config.clientSecret, {state: state, redirect_uri: redirect_uri}).then(function(response) {
     let accessToken = response.access_token;
     req.session.accessToken = accessToken;
     client = Dnsimple({accessToken: accessToken});
