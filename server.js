@@ -6,6 +6,7 @@ const http = require('http');
 const url = require('url');
 const sessions = require('client-sessions');
 const randomstring = require('randomstring');
+const util = require('util');
 
 const Dnsimple = require('dnsimple');
 
@@ -15,13 +16,15 @@ app.use(sessions({
   secret: config.session.secret,
 }));
 
+const redirect_uri = `http://${config.hostname}:${config.port}/authorized`
+
 // Handlers
 
 const errorHandler = function(req, res, error) {
-  console.log(error);
-  res.statusCode = 400;
+  console.error(error);
+  res.statusCode = 500;
   res.setHeader('Content-type', 'text/plain');
-  res.end(`error: ${error}`);
+  res.end(util.inspect(error));
 }
 
 const notFoundHandler = function(req, res) {
@@ -37,7 +40,7 @@ const rootHandler = function(req, res) {
 
   res.statusCode = 200;
   res.setHeader('Content-type', 'text/html');
-  res.end(`<a href="${client.oauth.authorizeUrl(config.clientId, {state: state})}">authorize</a>`);
+  res.end(`<a href="${client.oauth.authorizeUrl(config.clientId, {state: state, redirect_uri: redirect_uri})}">authorize</a>`);
 }
 
 const authorizedHandler = function(req, res) {
@@ -52,7 +55,7 @@ const authorizedHandler = function(req, res) {
   let client = Dnsimple({});
   let code = requestUrl.query.code;
 
-  client.oauth.exchangeAuthorizationForToken(code, config.clientId, config.clientSecret, {state: state}).then(function(response) {
+  client.oauth.exchangeAuthorizationForToken(code, config.clientId, config.clientSecret, {state: state, redirect_uri: redirect_uri}).then(function(response) {
     let accessToken = response.access_token;
     req.session.accessToken = accessToken;
     client = Dnsimple({accessToken: accessToken});
