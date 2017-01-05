@@ -8,7 +8,7 @@ const sessions = require('client-sessions');
 const randomstring = require('randomstring');
 
 const DnsimpleClient = require('dnsimple');
-Dnsimple = function (opts) {
+const Dnsimple = function (opts) {
   let baseUrl = 'https://api.sandbox.dnsimple.com';
   return DnsimpleClient(Object.assign({baseUrl: baseUrl}, opts));
 };
